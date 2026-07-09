@@ -1,0 +1,22 @@
+{
+  "name": "feelme",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "지금 내 마음에 가장 가까운 감정을 찾아주는 서비스",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.0",
+    "vite": "^6.0.7"
+  }
+}
