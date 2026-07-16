@@ -29,7 +29,8 @@
 
 - **React 18 + Vite**
 - **Tailwind CSS v4**
-- **localStorage** (감정 기록)
+- **Supabase** (회원가입/로그인 + PostgreSQL DB) — *선택*
+- **localStorage** (로그인하지 않은 게스트의 감정 기록)
 
 ## 🚀 실행
 
@@ -39,6 +40,32 @@ npm run dev      # 개발 서버
 npm run build    # 프로덕션 빌드
 npm run preview  # 빌드 결과 미리보기
 ```
+
+## 🔐 계정 · 데이터베이스 설정 (Supabase)
+
+Supabase를 연결하면 회원가입/로그인과 계정별 감정 기록 저장이 켜져요.
+**설정하지 않아도** 앱은 게스트 모드(브라우저 저장)로 정상 동작합니다.
+
+1. [supabase.com](https://supabase.com) 에서 무료 프로젝트 생성
+2. 대시보드 → **SQL Editor** → [`supabase/schema.sql`](supabase/schema.sql) 내용을 붙여넣고 **Run**
+3. 대시보드 → **Settings → API** 에서 `Project URL` 과 `anon public` 키 복사
+4. `.env.example` 을 복사해 `.env` 파일을 만들고 값 채우기:
+   ```
+   VITE_SUPABASE_URL=https://xxxx.supabase.co
+   VITE_SUPABASE_ANON_KEY=eyJhbGci...
+   ```
+5. 배포(Netlify)에도 같은 두 환경변수를 등록: **Site configuration → Environment variables**
+6. (선택) 즉시 로그인되게 하려면 **Authentication → Providers → Email** 에서
+   "Confirm email" 을 꺼도 돼요. 켜두면 가입 시 확인 메일이 발송됩니다.
+
+### 데이터베이스 구조
+
+| 테이블 | 설명 |
+|---|---|
+| `profiles` | 사용자 프로필 (auth.users와 1:1, 닉네임) |
+| `emotion_logs` | 사용자별 감정 결과 기록 (emotion_id, 시각) |
+
+모든 테이블은 **RLS(행 수준 보안)** 로 보호되어, 사용자는 자기 데이터만 읽고 쓸 수 있어요.
 
 ## ⚠️ 안내
 

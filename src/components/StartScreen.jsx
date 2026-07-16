@@ -1,12 +1,40 @@
 import { useMemo } from 'react'
 import { DAILY_QUOTES } from '../data/emotions.js'
 import { randomQuote } from '../lib/quiz.js'
+import { useAuth } from '../lib/AuthContext.jsx'
 
-export default function StartScreen({ onStart, onHistory, hasHistory }) {
+export default function StartScreen({ onStart, onHistory, onAuth, hasHistory }) {
   const quote = useMemo(() => randomQuote(DAILY_QUOTES), [])
+  const { user, displayName, configured, signOut } = useAuth()
 
   return (
     <div className="flex flex-col items-center justify-center min-h-full px-6 py-12 text-center">
+      {/* 상단 계정 영역 (Supabase 설정 시에만 표시) */}
+      {configured && (
+        <div className="w-full max-w-sm flex justify-end mb-2 -mt-4">
+          {user ? (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-slate-500 font-bold">
+                {displayName}님 반가워요 👋
+              </span>
+              <button
+                onClick={signOut}
+                className="text-slate-400 font-bold underline active:scale-95 transition"
+              >
+                로그아웃
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onAuth}
+              className="text-sm font-bold text-indigo-500 bg-white/70 border border-indigo-100 rounded-full px-4 py-1.5 active:scale-95 transition"
+            >
+              로그인 / 회원가입
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="anim-float">
         <div className="text-7xl mb-4 anim-bob">🧭</div>
         <h1 className="text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 to-purple-500">
@@ -46,6 +74,12 @@ export default function StartScreen({ onStart, onHistory, hasHistory }) {
         15개의 질문에 4단계로 답하면
         <br />
         30가지 감정 중 지금의 마음을 찾아드려요.
+        {configured && !user && (
+          <>
+            <br />
+            로그인하면 기록이 계정에 저장돼요.
+          </>
+        )}
       </p>
     </div>
   )

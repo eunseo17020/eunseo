@@ -1,37 +1,72 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import StartScreen from './components/StartScreen.jsx'
 import QuizScreen from './components/QuizScreen.jsx'
 import ResultScreen from './components/ResultScreen.jsx'
 import SafetyScreen from './components/SafetyScreen.jsx'
 import HistoryScreen from './components/HistoryScreen.jsx'
-import { loadHistory, saveResult, clearHistory } from './lib/storage.js'
+import AuthScreen from './components/AuthScreen.jsx'
+import { useAuth } from './lib/AuthContext.jsx'
+import {
+  loadLocalHistory,
+  saveLocalResult,
+  clearLocalHistory,
+  fetchRemoteHistory,
+  insertRemoteResult,
+  clearRemoteHistory,
+} from './lib/storage.js'
 
 export default function App() {
-  const [screen, setScreen] = useState('start') // start | quiz | safety | result | history
-  const [result, setResult] = useState(null) // { winner, risk, ... }
-  const [history, setHistory] = useState(() => loadHistory())
+  const { user } = useAuth()
+  const [screen, setScreen] = useState('start') // start | quiz | safety | result | history | auth
+  const [result, setResult] = useState(null)
+  const [history, setHistory] = useState([])
+
+  // 로그인 상태가 바뀌면 기록을 다시 불러옴 (로그인=DB, 게스트=로컬)
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      if (user) {
+        const h = await fetchRemoteHistory(user.id)
+        if (!cancelled) setHistory(h)
+      } else {
+        setHistory(loadLocalHistory())
+      }
+    }
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [user])
 
   function startQuiz() {
     setResult(null)
     setScreen('quiz')
   }
 
-  function handleComplete(res) {
+  async function handleComplete(res) {
     setResult(res)
-    // 결과는 항상 기록에 저장
-    const updated = saveResult(res.winner.id)
-    setHistory(updated)
+    if (user) {
+      await insertRemoteResult(user.id, res.winner.id)
+      setHistory(await fetchRemoteHistory(user.id))
+    } else {
+      setHistory(saveLocalResult(res.winner.id))
+    }
     // 위험 신호가 감지되면 안전 안내 화면 우선 노출
     setScreen(res.risk ? 'safety' : 'result')
   }
 
-  function goHistory() {
-    setHistory(loadHistory())
+  async function goHistory() {
+    if (user) setHistory(await fetchRemoteHistory(user.id))
+    else setHistory(loadLocalHistory())
     setScreen('history')
   }
 
-  function handleClearHistory() {
-    clearHistory()
+  async function handleClearHistory() {
+    if (user) {
+      await clearRemoteHistory(user.id)
+    } else {
+      clearLocalHistory()
+    }
     setHistory([])
   }
 
@@ -42,8 +77,13 @@ export default function App() {
           <StartScreen
             onStart={startQuiz}
             onHistory={goHistory}
+            onAuth={() => setScreen('auth')}
             hasHistory={history.length > 0}
           />
+        )}
+
+        {screen === 'auth' && (
+          <AuthScreen onDone={() => setScreen('start')} onBack={() => setScreen('start')} />
         )}
 
         {screen === 'quiz' && (

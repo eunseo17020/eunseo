@@ -1,0 +1,10 @@
+# Netlify 배포 설정 — 이 파일이 있으면 흰 화면 문제 없이 자동 빌드돼요.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA(단일 페이지 앱)라서 모든 경로를 index.html로 (혹시 모를 새로고침 대비)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
