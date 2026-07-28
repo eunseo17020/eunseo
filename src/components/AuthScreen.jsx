@@ -65,7 +65,7 @@ export default function AuthScreen({ onDone, onBack }) {
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🧭</div>
           <h1 className="text-2xl font-black text-slate-700">
-            {isSignup ? 'FeelMe 회원가입' : 'FeelMe 로그인'}
+            {isSignup ? 'moodi 회원가입' : 'moodi 로그인'}
           </h1>
           <p className="text-sm text-slate-400 mt-2">
             내 감정 기록을 계정에 안전하게 저장해요.

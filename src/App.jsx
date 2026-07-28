@@ -5,6 +5,8 @@ import ResultScreen from './components/ResultScreen.jsx'
 import SafetyScreen from './components/SafetyScreen.jsx'
 import HistoryScreen from './components/HistoryScreen.jsx'
 import AuthScreen from './components/AuthScreen.jsx'
+import DiaryScreen from './components/DiaryScreen.jsx'
+import BoardScreen from './components/BoardScreen.jsx'
 import { useAuth } from './lib/AuthContext.jsx'
 import {
   loadLocalHistory,
@@ -17,7 +19,8 @@ import {
 
 export default function App() {
   const { user } = useAuth()
-  const [screen, setScreen] = useState('start') // start | quiz | safety | result | history | auth
+  // start | quiz | safety | result | history | auth | diary | board
+  const [screen, setScreen] = useState('start')
   const [result, setResult] = useState(null)
   const [history, setHistory] = useState([])
 
@@ -70,6 +73,8 @@ export default function App() {
     setHistory([])
   }
 
+  const latestEmotion = result?.winner ?? null
+
   return (
     <div className="min-h-full bg-flow">
       <div className="mx-auto max-w-lg min-h-screen bg-white/30 backdrop-blur-sm">
@@ -78,6 +83,8 @@ export default function App() {
             onStart={startQuiz}
             onHistory={goHistory}
             onAuth={() => setScreen('auth')}
+            onDiary={() => setScreen('diary')}
+            onBoard={() => setScreen('board')}
             hasHistory={history.length > 0}
           />
         )}
@@ -103,6 +110,8 @@ export default function App() {
             onRestart={startQuiz}
             onHome={() => setScreen('start')}
             onHistory={goHistory}
+            onDiary={() => setScreen('diary')}
+            onBoard={() => setScreen('board')}
           />
         )}
 
@@ -111,6 +120,18 @@ export default function App() {
             history={history}
             onHome={() => setScreen('start')}
             onClear={handleClearHistory}
+          />
+        )}
+
+        {screen === 'diary' && (
+          <DiaryScreen onHome={() => setScreen('start')} todayEmotion={latestEmotion} />
+        )}
+
+        {screen === 'board' && (
+          <BoardScreen
+            onHome={() => setScreen('start')}
+            onAuth={() => setScreen('auth')}
+            latestEmotion={latestEmotion}
           />
         )}
       </div>

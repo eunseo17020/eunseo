@@ -3,7 +3,7 @@ import { DAILY_QUOTES } from '../data/emotions.js'
 import { randomQuote } from '../lib/quiz.js'
 import { useAuth } from '../lib/AuthContext.jsx'
 
-export default function StartScreen({ onStart, onHistory, onAuth, hasHistory }) {
+export default function StartScreen({ onStart, onHistory, onAuth, onDiary, onBoard, hasHistory }) {
   const quote = useMemo(() => randomQuote(DAILY_QUOTES), [])
   const { user, displayName, configured, signOut } = useAuth()
 
@@ -38,7 +38,7 @@ export default function StartScreen({ onStart, onHistory, onAuth, hasHistory }) 
       <div className="anim-float">
         <div className="text-7xl mb-4 anim-bob">🧭</div>
         <h1 className="text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 to-purple-500">
-          FeelMe
+          moodi
         </h1>
         <p className="mt-3 text-slate-500 text-base leading-relaxed">
           지금 내 마음에 가장 가까운 감정을
@@ -60,6 +60,22 @@ export default function StartScreen({ onStart, onHistory, onAuth, hasHistory }) 
         >
           감정 알아보기 시작 ✨
         </button>
+
+        <div className="flex gap-3">
+          <button
+            onClick={onDiary}
+            className="flex-1 py-3.5 rounded-2xl bg-white/80 text-slate-600 font-bold border border-slate-200 active:scale-95 transition-transform"
+          >
+            📖 감정 일기
+          </button>
+          <button
+            onClick={onBoard}
+            className="flex-1 py-3.5 rounded-2xl bg-white/80 text-slate-600 font-bold border border-slate-200 active:scale-95 transition-transform"
+          >
+            💬 익명 게시판
+          </button>
+        </div>
+
         {hasHistory && (
           <button
             onClick={onHistory}

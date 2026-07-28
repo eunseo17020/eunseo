@@ -1,6 +1,6 @@
 import { GROUPS } from '../data/emotions.js'
 
-export default function ResultScreen({ emotion, onRestart, onHome, onHistory }) {
+export default function ResultScreen({ emotion, onRestart, onHome, onHistory, onDiary, onBoard }) {
   const group = GROUPS[emotion.groups[0]]
 
   return (
@@ -57,29 +57,41 @@ export default function ResultScreen({ emotion, onRestart, onHome, onHistory }) 
       {/* 버튼 */}
       <div className="w-full max-w-md mt-8 space-y-3">
         <button
-          onClick={onRestart}
+          onClick={onDiary}
           className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-lg font-bold shadow-lg shadow-indigo-200 active:scale-95 transition-transform"
+        >
+          📖 이 감정으로 일기 쓰기
+        </button>
+        <button
+          onClick={onRestart}
+          className="w-full py-3.5 rounded-2xl bg-white/80 text-slate-600 font-bold border border-slate-200 active:scale-95 transition-transform"
         >
           다시 해보기 🔄
         </button>
         <div className="flex gap-3">
           <button
+            onClick={onBoard}
+            className="flex-1 py-3.5 rounded-2xl bg-white/80 text-slate-600 font-bold border border-slate-200 active:scale-95 transition-transform"
+          >
+            💬 게시판
+          </button>
+          <button
             onClick={onHistory}
             className="flex-1 py-3.5 rounded-2xl bg-white/80 text-slate-600 font-bold border border-slate-200 active:scale-95 transition-transform"
           >
-            📊 감정 기록
+            📊 기록
           </button>
           <button
             onClick={onHome}
             className="flex-1 py-3.5 rounded-2xl bg-white/80 text-slate-600 font-bold border border-slate-200 active:scale-95 transition-transform"
           >
-            🏠 처음으로
+            🏠 홈
           </button>
         </div>
       </div>
 
       <p className="mt-6 text-xs text-slate-400 text-center max-w-xs leading-relaxed">
-        FeelMe의 결과는 전문적인 진단이 아니에요.
+        moodi의 결과는 전문적인 진단이 아니에요.
         <br />
         마음이 많이 힘들다면 꼭 전문가의 도움을 받으세요.
       </p>
