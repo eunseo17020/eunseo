@@ -1,4 +1,4 @@
-// FeelMe · 감정 데이터
+// moodi · 감정 데이터
 // 30개 감정 × 15문항 = 450문항 은행
 // 각 감정: id, name, emoji(캐릭터), character(캐릭터 이름), groups(그룹), color,
 //          description(설명), comfort(위로), solutions(해결법), questions(문항 15개)

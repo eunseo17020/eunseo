@@ -1,4 +1,4 @@
--- FeelMe · 데이터베이스 스키마
+-- moodi · 데이터베이스 스키마
 -- Supabase 대시보드 → SQL Editor 에 이 파일 내용을 붙여넣고 "Run" 하세요.
 -- (한 번만 실행하면 돼요. 계정/로그인은 Supabase가 auth.users 로 자동 관리합니다.)
 

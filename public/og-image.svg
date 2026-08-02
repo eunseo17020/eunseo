@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef1ff"/>
+      <stop offset="0.5" stop-color="#f6efff"/>
+      <stop offset="1" stop-color="#fdf0f8"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6d7cff"/>
+      <stop offset="1" stop-color="#a67bff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- 나침반 아이콘 -->
+  <circle cx="600" cy="212" r="66" fill="none" stroke="url(#brand)" stroke-width="12"/>
+  <path d="M628 178 L586 192 L572 234 L614 220 Z" fill="url(#brand)"/>
+
+  <text x="600" y="380" text-anchor="middle" font-family="Noto Sans KR, sans-serif"
+        font-size="104" font-weight="900" fill="url(#brand)">moodi</text>
+  <text x="600" y="452" text-anchor="middle" font-family="Noto Sans KR, sans-serif"
+        font-size="36" fill="#6b7280">지금 내 마음에 가장 가까운 감정을 찾아보세요</text>
+  <text x="600" y="524" text-anchor="middle" font-family="Noto Sans KR, sans-serif"
+        font-size="28" fill="#9aa0b4">15개의 질문 · 30가지 감정 · 감정 일기</text>
+</svg>

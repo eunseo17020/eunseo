@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { EMOTION_BY_ID } from '../data/emotions.js'
 
-export default function HistoryScreen({ history, onHome, onClear }) {
+export default function HistoryScreen({ history, onHome, onClear, hasError = false, onRetry }) {
   // 감정별 집계
   const stats = useMemo(() => {
     const counts = {}
@@ -34,7 +34,24 @@ export default function HistoryScreen({ history, onHome, onClear }) {
         </button>
       </div>
 
-      {history.length === 0 ? (
+      {hasError ? (
+        <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-400">
+          <div className="text-5xl mb-3">📡</div>
+          <p className="mb-4">
+            기록을 불러오지 못했어요.
+            <br />
+            인터넷 연결을 확인해 주세요.
+          </p>
+          {onRetry && (
+            <button
+              onClick={onRetry}
+              className="px-5 py-2.5 rounded-xl bg-white/80 border border-slate-200 text-slate-600 font-bold active:scale-95 transition"
+            >
+              다시 시도
+            </button>
+          )}
+        </div>
+      ) : history.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-400">
           <div className="text-5xl mb-3">🌱</div>
           <p>아직 기록이 없어요.

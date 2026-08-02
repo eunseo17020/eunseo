@@ -49,8 +49,10 @@ Supabase를 연결하면 회원가입/로그인과 계정별 감정 기록 저�
 **설정하지 않아도** 앱은 게스트 모드(브라우저 저장)로 정상 동작합니다.
 
 1. [supabase.com](https://supabase.com) 에서 무료 프로젝트 생성
-2. 대시보드 → **SQL Editor** → [`supabase/schema.sql`](supabase/schema.sql) 실행,
-   이어서 [`supabase/schema_diary_board.sql`](supabase/schema_diary_board.sql) 도 실행 (일기·게시판 테이블)
+2. 대시보드 → **SQL Editor** 에서 순서대로 실행:
+   [`supabase/schema.sql`](supabase/schema.sql) →
+   [`supabase/schema_diary_board.sql`](supabase/schema_diary_board.sql) (일기·게시판) →
+   [`supabase/schema_v4_security.sql`](supabase/schema_v4_security.sql) (**익명성 보호 · 필수**)
 3. 대시보드 → **Settings → API** 에서 `Project URL` 과 `anon public` 키 복사
 4. `.env.example` 을 복사해 `.env` 파일을 만들고 값 채우기:
    ```
@@ -68,11 +70,16 @@ Supabase를 연결하면 회원가입/로그인과 계정별 감정 기록 저�
 | `profiles` | 사용자 프로필 (auth.users와 1:1, 닉네임) |
 | `emotion_logs` | 사용자별 감정 결과 기록 (emotion_id, 시각) |
 | `diary_entries` | 감정 일기 (감정 + 내용 + 시각) |
-| `posts` | 익명 게시판 글 (닉네임·감정·내용) — 모두 읽기, 본인만 삭제 |
+| `posts` | 익명 게시판 글 (닉네임·감정·내용) — 로그인 사용자만 읽기, 본인만 삭제 |
 | `post_likes` | 게시글 공감 (한 사람당 글마다 1번) |
 
 모든 테이블은 **RLS(행 수준 보안)** 로 보호돼요. 개인 데이터(`profiles`·`emotion_logs`·`diary_entries`)는
-본인만 접근할 수 있고, 게시판(`posts`)은 누구나 읽되 작성은 로그인 사용자, 삭제는 본인 글만 가능해요.
+본인만 접근할 수 있어요.
+
+**익명 게시판의 익명성 보호**: `posts`·`post_likes`의 `user_id` 컬럼은 API에서 조회할 수 없도록
+권한을 차단했고(`revoke select`), `user_id`는 서버가 `auth.uid()`로 자동으로 채워요.
+내 글·내 공감 목록은 `my_post_ids()` / `my_liked_post_ids()` **SECURITY DEFINER 함수**로만 조회하므로,
+다른 사람이 글쓴이를 역추적할 수 없어요.
 
 ## ⚠️ 안내
 
@@ -84,4 +91,4 @@ moodi의 결과는 전문적인 진단이 아닙니다. 마음이 많이 힘들�
 
 ---
 
-📄 기획·설계 문서: [`docs/FeelMe_기획서.pdf`](docs/FeelMe_기획서.pdf)
+📄 기획·설계 문서: [`docs/moodi_기획서.pdf`](docs/moodi_기획서.pdf)

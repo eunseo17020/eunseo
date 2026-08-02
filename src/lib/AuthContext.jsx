@@ -1,4 +1,4 @@
-// FeelMe · 인증(로그인) 상태 관리
+// moodi · 인증(로그인) 상태 관리
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase, isSupabaseConfigured } from './supabase.js'
 

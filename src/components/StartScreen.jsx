@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { DAILY_QUOTES } from '../data/emotions.js'
 import { randomQuote } from '../lib/quiz.js'
 import { useAuth } from '../lib/AuthContext.jsx'
+import Disclaimer from './Disclaimer.jsx'
 
 export default function StartScreen({ onStart, onHistory, onAuth, onDiary, onBoard, hasHistory }) {
   const quote = useMemo(() => randomQuote(DAILY_QUOTES), [])
@@ -97,6 +98,8 @@ export default function StartScreen({ onStart, onHistory, onAuth, onDiary, onBoa
           </>
         )}
       </p>
+
+      <Disclaimer className="mt-6 max-w-xs" />
     </div>
   )
 }

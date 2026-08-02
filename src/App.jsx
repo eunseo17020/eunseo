@@ -18,21 +18,25 @@ import {
 } from './lib/storage.js'
 
 export default function App() {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   // start | quiz | safety | result | history | auth | diary | board
   const [screen, setScreen] = useState('start')
   const [result, setResult] = useState(null)
   const [history, setHistory] = useState([])
+  const [historyError, setHistoryError] = useState(false)
 
   // 로그인 상태가 바뀌면 기록을 다시 불러옴 (로그인=DB, 게스트=로컬)
   useEffect(() => {
     let cancelled = false
     async function load() {
       if (user) {
-        const h = await fetchRemoteHistory(user.id)
-        if (!cancelled) setHistory(h)
+        const { data, error } = await fetchRemoteHistory(user.id)
+        if (cancelled) return
+        setHistory(data)
+        setHistoryError(Boolean(error))
       } else {
         setHistory(loadLocalHistory())
+        setHistoryError(false)
       }
     }
     load()
@@ -50,7 +54,9 @@ export default function App() {
     setResult(res)
     if (user) {
       await insertRemoteResult(user.id, res.winner.id)
-      setHistory(await fetchRemoteHistory(user.id))
+      const { data, error } = await fetchRemoteHistory(user.id)
+      setHistory(data)
+      setHistoryError(Boolean(error))
     } else {
       setHistory(saveLocalResult(res.winner.id))
     }
@@ -59,8 +65,14 @@ export default function App() {
   }
 
   async function goHistory() {
-    if (user) setHistory(await fetchRemoteHistory(user.id))
-    else setHistory(loadLocalHistory())
+    if (user) {
+      const { data, error } = await fetchRemoteHistory(user.id)
+      setHistory(data)
+      setHistoryError(Boolean(error))
+    } else {
+      setHistory(loadLocalHistory())
+      setHistoryError(false)
+    }
     setScreen('history')
   }
 
@@ -74,6 +86,20 @@ export default function App() {
   }
 
   const latestEmotion = result?.winner ?? null
+
+  // 로그인 상태를 확인하는 동안 잠깐 스플래시 (로그인 버튼이 깜빡이는 것 방지)
+  if (authLoading) {
+    return (
+      <div className="min-h-full bg-flow">
+        <div className="mx-auto max-w-lg min-h-screen bg-white/30 backdrop-blur-sm flex flex-col items-center justify-center">
+          <div className="text-6xl anim-bob">🧭</div>
+          <p className="mt-4 text-2xl font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-500 to-purple-500">
+            moodi
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-full bg-flow">
@@ -118,6 +144,8 @@ export default function App() {
         {screen === 'history' && (
           <HistoryScreen
             history={history}
+            hasError={historyError}
+            onRetry={goHistory}
             onHome={() => setScreen('start')}
             onClear={handleClearHistory}
           />
