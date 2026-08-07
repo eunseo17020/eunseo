@@ -75,7 +75,7 @@ export const EMOTIONS = [
     ]),
   },
   {
-    id: 'anticipation', name: '기대감', emoji: '🤩', character: '기대’이',
+    id: 'anticipation', name: '기대감', emoji: '🤩', character: '기대이',
     groups: ['positive_high'], color: '#ffb84d',
     description: '곧 다가올 좋은 일을 그리며 마음이 부풀어 오르는 상태예요. 내일이 오늘보다 나을 거라는 희망이 당신을 앞으로 나아가게 해요.',
     comfort: [

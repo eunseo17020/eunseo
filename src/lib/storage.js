@@ -184,35 +184,44 @@ export async function fetchPosts() {
   )
 }
 
-// 내가 쓴 글 id (삭제 버튼 표시용) — 서버 함수로만 조회
-export async function fetchMyPostIds() {
+// 내가 쓴 글 id (삭제 버튼 표시용)
+// 1순위: SECURITY DEFINER 함수 (익명성 보호가 켜진 상태)
+// 2순위: 직접 조회 (보안 마이그레이션 실행 전 상태) → 둘 다 지원해서 언제든 동작
+export async function fetchMyPostIds(userId) {
   if (!supabase) return new Set()
   const { data, error } = await supabase.rpc('my_post_ids')
-  if (error) {
-    // 아직 v4 마이그레이션 SQL을 실행하지 않은 경우 → 삭제 버튼만 안 보일 뿐 앱은 정상 동작
-    console.error('내 글 목록 조회 실패:', error.message)
+  if (!error) return new Set(data ?? [])
+
+  const fallback = await supabase.from('posts').select('id').eq('user_id', userId)
+  if (fallback.error) {
+    console.error('내 글 목록 조회 실패:', fallback.error.message)
     return new Set()
   }
-  return new Set(data ?? [])
+  return new Set(fallback.data.map((r) => r.id))
 }
 
-// 내가 공감한 글 id — 서버 함수로만 조회
-export async function fetchMyLikes() {
+// 내가 공감한 글 id (위와 동일한 2단계 방식)
+export async function fetchMyLikes(userId) {
   if (!supabase) return new Set()
   const { data, error } = await supabase.rpc('my_liked_post_ids')
-  if (error) {
-    console.error('내 공감 목록 조회 실패:', error.message)
+  if (!error) return new Set(data ?? [])
+
+  const fallback = await supabase.from('post_likes').select('post_id').eq('user_id', userId)
+  if (fallback.error) {
+    console.error('내 공감 목록 조회 실패:', fallback.error.message)
     return new Set()
   }
-  return new Set(data ?? [])
+  return new Set(fallback.data.map((r) => r.post_id))
 }
 
 // 성공하면 작성된 글, 실패하면 null
-export async function createPost({ content, emotionId, nickname }) {
+// user_id 를 명시적으로 보내요 — 보안 마이그레이션(schema_v5.sql) 실행 전에도 동작하게.
+// 위조 걱정은 없어요: RLS 의 with check (auth.uid() = user_id) 가 남의 id 사용을 막아요.
+export async function createPost(userId, { content, emotionId, nickname }) {
   if (!supabase) return null
   const { data, error } = await supabase
     .from('posts')
-    .insert({ content, emotion_id: emotionId ?? null, nickname })
+    .insert({ user_id: userId, content, emotion_id: emotionId ?? null, nickname })
     .select('id, nickname, emotion_id, content, created_at')
     .single()
   if (error) {
@@ -240,9 +249,11 @@ export async function deletePost(id) {
   return true
 }
 
-export async function likePost(postId) {
+export async function likePost(userId, postId) {
   if (!supabase) return false
-  const { error } = await supabase.from('post_likes').insert({ post_id: postId })
+  const { error } = await supabase
+    .from('post_likes')
+    .insert({ user_id: userId, post_id: postId })
   if (error && !error.message.includes('duplicate')) {
     console.error('공감 실패:', error.message)
     return false

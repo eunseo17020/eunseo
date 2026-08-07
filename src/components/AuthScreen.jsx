@@ -36,6 +36,11 @@ export default function AuthScreen({ onDone, onBack }) {
           setError(translateError(error.message))
         } else if (data?.session) {
           onDone() // 바로 로그인됨 (이메일 확인 꺼져 있을 때)
+        } else if (data?.user && data.user.identities?.length === 0) {
+          // Supabase 는 보안상 중복 가입도 성공처럼 응답해요.
+          // (identities 가 비어 있으면 이미 있는 계정) → 메일을 기다리게 두면 안 돼요.
+          setError('이미 가입된 이메일이에요. 아래에서 로그인해 주세요.')
+          setMode('login')
         } else {
           setInfo('가입 확인 메일을 보냈어요. 메일함에서 링크를 눌러 인증한 뒤 로그인해 주세요.')
           setMode('login')

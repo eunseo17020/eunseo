@@ -48,8 +48,8 @@ export default function BoardScreen({ onHome, onAuth, latestEmotion = null }) {
     setPosts(data)
     setLoadError(Boolean(error))
     if (user) {
-      setMyPosts(await fetchMyPostIds())
-      setMyLikes(await fetchMyLikes())
+      setMyPosts(await fetchMyPostIds(user.id))
+      setMyLikes(await fetchMyLikes(user.id))
     } else {
       setMyPosts(new Set())
       setMyLikes(new Set())
@@ -74,7 +74,7 @@ export default function BoardScreen({ onHome, onAuth, latestEmotion = null }) {
     setPostError('')
 
     const emoId = attachEmotion && latestEmotion ? latestEmotion.id : null
-    const created = await createPost({
+    const created = await createPost(user.id, {
       content: text,
       emotionId: emoId,
       nickname: randomNickname(),
@@ -116,7 +116,7 @@ export default function BoardScreen({ onHome, onAuth, latestEmotion = null }) {
     }
 
     applyLocal(!liked)
-    const success = liked ? await unlikePost(post.id) : await likePost(post.id)
+    const success = liked ? await unlikePost(post.id) : await likePost(user.id, post.id)
     if (!success) applyLocal(liked) // 실패하면 되돌리기
   }
 
@@ -205,7 +205,7 @@ export default function BoardScreen({ onHome, onAuth, latestEmotion = null }) {
 
         <p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
           닉네임은 글마다 무작위로 바뀌고, 누가 썼는지는 표시되지 않아요.
-          서로를 존중하는 말로 남겨주세요.
+          서로를 존중하는 말로 남겨주세요. 다른 사람에게 상처를 주는 글은 삭제될 수 있어요.
         </p>
       </div>
 

@@ -71,6 +71,17 @@ export default function QuizScreen({ onComplete, onExit }) {
     }, 180)
   }
 
+  // 답변을 하나라도 했으면 실수로 나가지 않게 한 번 물어봐요
+  function handleExit() {
+    if (answers.length > 0) {
+      const leave = window.confirm(
+        `지금 나가면 답변한 ${answers.length}개가 사라져요. 그만할까요?`
+      )
+      if (!leave) return
+    }
+    onExit()
+  }
+
   if (!current) return null
 
   return (
@@ -78,7 +89,7 @@ export default function QuizScreen({ onComplete, onExit }) {
       {/* 상단바 */}
       <div className="flex items-center gap-3">
         <button
-          onClick={onExit}
+          onClick={handleExit}
           className="text-slate-400 text-sm font-bold active:scale-90 transition"
           aria-label="그만두기"
         >
