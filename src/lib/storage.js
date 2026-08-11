@@ -159,19 +159,39 @@ export async function deleteRemoteDiary(id) {
 
 // ── 익명 게시판 (Supabase 필요) ──────────────────────────
 // ⚠️ 익명성: user_id 는 절대 조회하지 않아요.
-//    DB에서도 user_id 컬럼 조회 권한을 막아두었어요 (schema_v4_security.sql).
-//    user_id 는 서버가 auth.uid() 기본값으로 채우므로 클라이언트가 보내지 않아요.
+//    DB에서도 user_id 컬럼 조회 권한을 막아두었어요 (schema_v5.sql).
+//
+// 📌 공감 수는 post_likes(count) 임베드를 쓰지 않아요.
+//    그 방식은 post_likes 의 "모든 컬럼"(user_id 포함) 접근을 요구해서,
+//    익명성 보호와 충돌해 목록 전체가 실패했어요.
+//    대신 post_id 만 가져와서 직접 세어요 (익명성 유지 + 안정적).
 export async function fetchPosts() {
   if (!supabase) return ok([])
+
   const { data, error } = await supabase
     .from('posts')
-    .select('id, nickname, emotion_id, content, created_at, post_likes(count)')
+    .select('id, nickname, emotion_id, content, created_at')
     .order('created_at', { ascending: false })
     .limit(100)
   if (error) {
     console.error('게시글 불러오기 실패:', error.message)
     return fail(error)
   }
+
+  // 공감 수 세기 (실패해도 글 목록은 정상 표시)
+  const counts = {}
+  const ids = data.map((p) => p.id)
+  if (ids.length) {
+    const likeRes = await supabase.from('post_likes').select('post_id').in('post_id', ids)
+    if (likeRes.error) {
+      console.error('공감 수 불러오기 실패:', likeRes.error.message)
+    } else {
+      likeRes.data.forEach((r) => {
+        counts[r.post_id] = (counts[r.post_id] || 0) + 1
+      })
+    }
+  }
+
   return ok(
     data.map((p) => ({
       id: p.id,
@@ -179,7 +199,7 @@ export async function fetchPosts() {
       emotionId: p.emotion_id,
       content: p.content,
       date: p.created_at,
-      likes: p.post_likes?.[0]?.count ?? 0,
+      likes: counts[p.id] ?? 0,
     }))
   )
 }
